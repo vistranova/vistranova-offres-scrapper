@@ -40,41 +40,33 @@ async function getDataFromMongoDB(dbName, collectionName, today) {
 }
 
 const getMarcheList = async (req, res) => {
-    const browser = await puppeteer.launch({
-        headless: true,
-        executablePath: '/path/to/chromium', // Specify the path to Chromium
-        args: ['--no-sandbox', '--disable-setuid-sandbox'], // Required for some hosting environments
-    });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     try {
         await page.goto(process.env.SEARCH_URL);
 
-        // select
+        // Select procedure type
         await page.waitForSelector('#ctl0_CONTENU_PAGE_AdvancedSearch_procedureType');
         await page.select('#ctl0_CONTENU_PAGE_AdvancedSearch_procedureType', '1');
 
-        // date 1 empty
+        // Clear start and end dates
         await page.waitForSelector('#ctl0_CONTENU_PAGE_AdvancedSearch_dateMiseEnLigneStart');
         await page.$eval('#ctl0_CONTENU_PAGE_AdvancedSearch_dateMiseEnLigneStart', el => el.value = '');
 
-        // date 2 empty
         await page.waitForSelector('#ctl0_CONTENU_PAGE_AdvancedSearch_dateMiseEnLigneEnd');
         await page.$eval('#ctl0_CONTENU_PAGE_AdvancedSearch_dateMiseEnLigneEnd', el => el.value = '');
 
-        // getting date of date publie
-        await page.waitForSelector('#ctl0_CONTENU_PAGE_AdvancedSearch_dateMiseEnLigneCalculeEnd');
-        await page.waitForSelector('#ctl0_CONTENU_PAGE_AdvancedSearch_dateMiseEnLigneCalculeStart');
-
-        // put it date of today
+        // Set today's date for dateMiseEnLigneCalcule
         const endDateValue = await page.$eval('#ctl0_CONTENU_PAGE_AdvancedSearch_dateMiseEnLigneCalculeEnd', el => el.value);
         await page.$eval('#ctl0_CONTENU_PAGE_AdvancedSearch_dateMiseEnLigneCalculeStart', (el, value) => el.value = value, endDateValue);
 
+        // Start search
         await page.waitForSelector('#ctl0_CONTENU_PAGE_AdvancedSearch_lancerRecherche');
         await page.click('#ctl0_CONTENU_PAGE_AdvancedSearch_lancerRecherche');
         await page.waitForNavigation();
 
-        // wait for select col to select 50
+        // Set items per page to 50
         const selectorExists = await page.$('#ctl0_CONTENU_PAGE_resultSearch_listePageSizeTop') !== null;
         if (selectorExists) {
             await page.select('#ctl0_CONTENU_PAGE_resultSearch_listePageSizeTop', '50');
