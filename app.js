@@ -7,6 +7,9 @@ const { ScrapOffres } = require('./controller')
 
 // Route to display message
 app.get('/', ScrapOffres);
+app.get('/test', (req, res) => {
+    res.send('Test route is working!');
+});
 
 // Start the server
 app.listen(process.env.PORT, () => {
