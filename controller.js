@@ -40,7 +40,11 @@ async function getDataFromMongoDB(dbName, collectionName, today) {
 }
 
 const getMarcheList = async (req, res) => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+        headless: true,
+        executablePath: '/path/to/chromium', // Specify the path to Chromium
+        args: ['--no-sandbox', '--disable-setuid-sandbox'], // Required for some hosting environments
+    });
     const page = await browser.newPage();
 
     try {
