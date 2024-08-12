@@ -6,7 +6,9 @@ const app = express();
 const { ScrapOffres } = require('./controller')
 
 // Route to display message
-app.get('/', ScrapOffres);
+app.get('/', (req, res) => {
+    res.send('Hello, World!'); // Simple response to test basic functionality
+});
 app.get('/test', (req, res) => {
     res.send('Test route is working!');
 });
