@@ -2,6 +2,7 @@ const axios = require("axios");
 const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
 const { MongoClient } = require('mongodb');
+const logger = require('./logger');
 require('dotenv').config();
 
 let client;
@@ -21,6 +22,7 @@ async function insertDataIntoMongoDB(dbName, collectionName, data) {
 
         console.log(`${data.length} objects inserted into MongoDB successfully.`);
     } catch (err) {
+        logger.error(`Error inserting data into MongoDB: ${err.message}`);
         console.error('Error inserting data into MongoDB:', err);
     }
 }
@@ -118,6 +120,7 @@ const getMarcheList = async (req, res) => {
         res.send(`Scraper finished. Inserted ${todayData.length} new records.`);
     } catch (err) {
         console.log("Error: " + err);
+        logger.error(`Scraping error: ${err.message}`);
         res.status(500).send("Error occurred during scraping.");
     } finally {
         await browser.close();
