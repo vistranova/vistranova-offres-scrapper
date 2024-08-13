@@ -44,8 +44,11 @@ async function getDataFromMongoDB(dbName, collectionName, today) {
 const getMarcheList = async (req, res) => {
     console.log("Starting Puppeteer...");
     const browser = await puppeteer.launch({
+        executablePath: process.env.NODE_ENV === 'production'
+            ? process.env.PUPPETEER_EXECUTABLE_PATH
+            : puppeteer.executablePath(),
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--single-process', '--no-zygote']
     });
     const page = await browser.newPage();
     console.log("Puppeteer launched, navigating to search URL...");
